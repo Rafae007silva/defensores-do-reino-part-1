@@ -1,0 +1,12 @@
+{
+  "name": "level-15-online-coop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Level 15 cooperativo online para dois celulares",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

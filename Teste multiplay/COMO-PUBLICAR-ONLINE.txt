@@ -1,0 +1,28 @@
+LEVEL 15 ONLINE — 2 CELULARES, SEM INSTALAR APLICATIVO
+
+Para jogar de redes diferentes, e necessario PUBLICAR o servidor em um servico de hospedagem Node.js.
+O ZIP contem o jogo e o servidor prontos, mas NAO e um site ja publicado.
+
+PASSO A PASSO PELO NAVEGADOR (exemplo: GitHub + Render):
+1. Crie uma conta no github.com e um repositorio novo.
+2. Envie TODOS os arquivos desta pasta para a raiz do repositorio, incluindo level15/, server.js, package.json e render.yaml.
+   No GitHub, use Add file > Upload files.
+3. Crie uma conta em render.com, conecte seu GitHub e crie um Web Service a partir do repositorio.
+4. Escolha Node e, se solicitado, configure Build Command: npm install; Start Command: npm start.
+   Se o plano gratuito estiver disponivel, selecione-o. A disponibilidade e os limites podem mudar.
+5. Aguarde a publicacao e copie o endereco HTTPS fornecido pelo Render.
+6. Abra O MESMO endereco HTTPS nos dois celulares, mesmo usando redes diferentes.
+7. No primeiro celular, toque em CRIAR SALA; envie o codigo ao segundo jogador.
+8. No segundo celular, digite o codigo e toque em ENTRAR NA SALA.
+9. O primeiro jogador toca em INICIAR PARTIDA quando aparecer 2/2.
+
+CONTROLES: celular na horizontal; toque para colocar/selecionar X-Besta, mire tocando no ceu e use o botao ATIRAR.
+O anfitriao (jogador 1) simula o jogo; o convidado (jogador 2) recebe o estado e envia suas acoes.
+
+OBSERVACOES:
+- Nao precisa instalar aplicativos nos celulares; so um navegador e acesso a internet.
+- O jogo precisa de um servidor online em funcionamento. Nao e possivel fazer multiplayer online entre redes diferentes abrindo apenas index.html.
+- Em planos gratuitos, o servidor pode adormecer apos inatividade e levar algum tempo para reativar.
+- As salas sao temporarias: se o servidor reiniciar ou um jogador sair, sera necessario criar outra sala.
+- Nao inclui contas, ranking, salvamento online ou sistema anti-trapaca competitivo.
+- Teste em dois aparelhos reais apos publicar.

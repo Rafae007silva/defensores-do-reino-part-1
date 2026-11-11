@@ -1,0 +1,1 @@
+Coloque os arquivos de som nesta pasta. Os efeitos das torres e morte de goblin existentes foram preservados. Para musica de fundo, coloque seu arquivo com nome musica.mp3 aqui (nao incluido no pacote original).

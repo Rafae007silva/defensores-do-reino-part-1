@@ -1,0 +1,3 @@
+Level 3 — Vila Medieval: sons suaves das torres 1 a 4 e morte dos goblins iguais aos Levels 1 e 2.
+Torre 5 (fogo): novo efeito suave de fogo.
+Para adicionar música, coloque musica.mp3 nesta pasta.

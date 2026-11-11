@@ -1,0 +1,10 @@
+LEVEL 15 — VULCÃO DAS CINZAS
+
+Abra index.html no navegador.
+Jogabilidade baseada no Level 10: X-Bestas contra goblins voadores, bombas e castelo.
+Novo cenário pálido de cinzas com vulcão central ao fundo, fumaça e partículas.
+Arquivos: index.html, style.css, script.js.
+
+EVENTO DRAGÃO: 2 passagens por partida, uma esquerda→direita e outra direita→esquerda, acionadas durante a progressão. Cada travessia dura 15,5 segundos. O dragão aparece somente na faixa superior, com cabeça parcialmente cortada pelo alto, asas batendo e cauda longa. Evento visual sem interferir nos controles.
+
+Controle adicional: tecla A dispara a X-Besta selecionada. Nenhuma dica sobre a tecla aparece na tela.

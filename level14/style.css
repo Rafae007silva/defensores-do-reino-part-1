@@ -1,0 +1,225 @@
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#091710;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;touch-action:manipulation}.game{height:100dvh;width:100%;display:flex;flex-direction:column;background:#12241c}.hud{height:54px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:5px 16px;background:linear-gradient(90deg,#193b29,#10251b);border-bottom:2px solid #537449;gap:8px}.brand{font-size:clamp(11px,1.7vw,19px);white-space:nowrap}.stats{display:flex;align-items:center;gap:clamp(5px,1.5vw,16px);font-size:clamp(12px,1.7vw,18px);font-weight:800;white-space:nowrap}.stats span{background:#09190f;padding:6px 10px;border:1px solid #52734b;border-radius:10px}.arena{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse,#305d35,#13291c)}canvas{display:block;max-width:100%;max-height:100%;touch-action:none;cursor:crosshair}.shop{height:96px;flex-shrink:0;display:flex;justify-content:center;align-items:stretch;gap:clamp(4px,1vw,12px);padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));background:linear-gradient(#1b3828,#0d1d15);border-top:2px solid #7a995c}.unit{min-width:0;width:min(23%,170px);border:2px solid #67865c;border-radius:13px;background:linear-gradient(#305239,#1c3224);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-weight:750;cursor:pointer;position:relative;touch-action:manipulation}.unit .emoji{font-size:clamp(22px,3.5vw,35px);line-height:1}.unit .name{font-size:clamp(10px,1.4vw,14px)}.unit .price{font-size:clamp(10px,1.3vw,14px);color:#ffe58c}.unit.selected{border-color:#ffe275;box-shadow:0 0 0 2px #ffda5899,inset 0 0 18px #e7c24733;background:#496440}.unit.unaffordable{opacity:.52}.overlay{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:#06120cba;z-index:4;padding:10px}.overlay.hidden{display:none}.modal{width:min(430px,92%);text-align:center;padding:clamp(14px,3vh,28px);border-radius:20px;border:2px solid #a4c478;background:linear-gradient(145deg,#264b32,#14291e);box-shadow:0 15px 60px #0009}.modal-icon{font-size:42px}.modal h1{font-size:clamp(21px,3vw,32px);margin:6px 0}.modal p{font-size:clamp(12px,1.7vw,16px);line-height:1.5;color:#d9e8d0}.modal button{background:#e6bd47;border:0;border-radius:12px;padding:12px 22px;font-weight:900;color:#25301a;cursor:pointer}@media(max-width:650px){.hud{height:40px;padding:3px 6px}.brand{font-size:10px}.stats{gap:3px;font-size:10px}.stats span{padding:4px 5px;border-radius:6px}.shop{height:76px;gap:5px;padding:5px 6px calc(5px + env(safe-area-inset-bottom))}.unit{border-radius:9px}.unit .emoji{font-size:23px}.unit .name,.unit .price{font-size:10px}}@media(max-height:440px){.hud{height:35px}.shop{height:64px}.unit .emoji{font-size:20px}.modal-icon{font-size:26px}.modal{padding:10px}.modal p{margin:5px}.modal button{padding:8px 14px}}@media(orientation:portrait) and (max-width:650px){.brand strong{display:none}.hud{height:44px}.shop{height:86px}}
+
+/* Tabuleiro vertical: 9 colunas por 18 linhas. Barra inferior fixa. */
+.arena{padding:4px 0}.shop{width:100%;margin-top:auto}.game{min-height:0}
+@media (min-width:800px){.arena canvas{box-shadow:0 0 0 3px #73915c,0 12px 45px #0008;border-radius:7px}}
+@media (max-width:650px){.shop{height:clamp(76px,12dvh,100px)}.arena{padding:2px 0}}
+
+/* MAPA HORIZONTAL GRANDE — arraste para os lados no celular */
+.arena{display:block;overflow-x:auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;scrollbar-width:thin;scrollbar-color:#a6c46c #173420;position:relative}
+.arena canvas{max-width:none;max-height:none;width:auto;height:auto;touch-action:pan-x pan-y;cursor:crosshair;margin:auto}
+.arena .overlay{position:sticky;left:0;top:0;width:100%;height:100%;min-height:100%;z-index:5}
+
+.game{overflow:hidden}
+@media(max-width:900px){.arena canvas{margin:0}.arena{justify-content:initial;align-items:initial}.brand strong{display:none}}
+
+/* Minimapa flutuante: acompanha o tamanho da tela e nunca rola com o mapa */
+.game{position:relative}
+.minimap{position:absolute;z-index:7;top:60px;left:50%;transform:translateX(-50%);width:min(430px,calc(100vw - 18px));padding:6px 9px 8px;background:#10251ff2;border:2px solid #a3c579;border-radius:12px;box-shadow:0 5px 22px #0009;pointer-events:auto;user-select:none}
+.minimap-title{display:flex;align-items:center;justify-content:space-between;gap:5px;font-weight:900;font-size:11px;color:#e5f4c5;margin-bottom:4px}
+.minimap-title span{font-weight:600;color:#c1d6bc;font-size:10px}
+#minimapCanvas{display:block;width:100%;height:auto;max-width:100%;max-height:none;touch-action:none;cursor:pointer;border-radius:5px}
+@media(max-width:650px){.minimap{top:44px;width:min(300px,calc(100vw - 12px));padding:4px 6px 6px}.minimap-title{font-size:9px;margin-bottom:2px}.minimap-title span{font-size:8px}}
+@media(max-height:440px){.minimap{top:37px;width:min(235px,calc(100vw - 12px));padding:3px 5px}.minimap-title{font-size:8px}.minimap-title span{font-size:7px}}
+
+/* HUD sem título e minimapa compacto fixo no canto superior esquerdo */
+.hud{justify-content:flex-end}
+.minimap{top:calc(54px + 7px);left:8px;right:auto;transform:none;width:clamp(125px,17vw,205px);padding:4px 5px 5px;border-width:1px;border-radius:8px;background:#10251fe8;box-shadow:0 3px 12px #0008}
+.minimap-title{font-size:9px;margin-bottom:2px}
+.minimap-title span{display:none}
+@media(max-width:650px){.minimap{top:calc(40px + 5px);left:5px;width:clamp(112px,30vw,155px);padding:3px 4px 4px}.minimap-title{font-size:8px}}
+@media(max-height:440px){.minimap{top:calc(35px + 4px);width:112px;left:4px}}
+@media(orientation:portrait) and (max-width:650px){.minimap{top:calc(44px + 5px)}}
+
+/* Pixel art 2.5D: preservar pixels nítidos ao redimensionar. */
+#board{image-rendering:pixelated;image-rendering:crisp-edges}
+
+/* Floresta orgânica: renderização suavizada sem efeito de quadrados */
+#board{image-rendering:auto}
+
+/* Visual pixel art em todo o jogo */
+#board,#minimapCanvas{image-rendering:pixelated!important;image-rendering:crisp-edges!important}
+.unit,.hud,.minimap,.modal{border-radius:3px!important;box-shadow:4px 4px 0 #0c241d!important}
+.unit{border-width:2px!important}
+
+/* Miniaturas pixeladas das casas medievais na loja */
+.house-preview{width:46px;height:46px;image-rendering:pixelated;display:block;margin:auto}
+.unit .emoji{display:flex;align-items:center;justify-content:center;min-height:48px}
+
+/* Preço pequeno sobre o canto superior esquerdo da imagem da torre */
+.unit{position:relative!important;overflow:visible}
+.unit .price{position:absolute!important;top:3px!important;left:3px!important;z-index:2;display:inline-flex;align-items:center;justify-content:center;font-size:10px!important;line-height:1!important;padding:3px 4px!important;background:#13271de8;border:1px solid #f5cf65;border-radius:4px;color:#ffeb9c!important;font-weight:900;pointer-events:none;box-shadow:1px 2px 0 #0008}
+.unit .emoji{position:relative}
+@media(max-width:650px){.unit .price{top:2px!important;left:2px!important;font-size:9px!important;padding:2px 3px!important}.house-preview{width:42px;height:42px}}
+
+/* Opções exibidas somente ao terminar a partida */
+.modal-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:14px}
+.modal-actions #home{background:#233f30;color:#fff;border:2px solid #b9d39b}
+.modal-actions button{min-width:140px;max-width:100%;font-size:14px}
+.modal-actions [hidden]{display:none!important}
+@media(max-width:420px){.modal-actions{gap:8px}.modal-actions button{flex:1 1 100%;padding:10px 12px}}
+
+/* Controle de pausa flutuante no canto inferior direito, acima da loja */
+.pause-button{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:calc(96px + 12px + env(safe-area-inset-bottom));z-index:8;min-width:108px;padding:10px 12px;background:#193c2b;color:#fff4c7;border:2px solid #e6c46c;border-radius:5px;font-weight:900;font-size:12px;box-shadow:3px 4px 0 #081a11;cursor:pointer;touch-action:manipulation}
+.pause-button[hidden]{display:none!important}
+.pause-button[aria-pressed="true"]{background:#b68a34;color:#161d12}
+@media(max-width:650px){.pause-button{bottom:calc(clamp(76px,12dvh,100px) + 9px);right:8px;padding:8px 9px;min-width:95px;font-size:11px}}
+@media(max-height:440px){.pause-button{bottom:calc(64px + 8px)}}
+
+/* Pequeno aviso antes da partida */
+.tower-tip{display:flex;align-items:center;gap:10px;margin:12px auto 6px;padding:11px 12px;max-width:310px;background:#182f23;border:2px solid #d8b66a;border-radius:8px;box-shadow:0 4px 0 #07150d;color:#fff4d2;text-align:left}
+.tower-tip[hidden]{display:none!important}.tower-tip-icon{flex:none;font-size:25px}.tower-tip strong{display:block;font-size:12px;letter-spacing:.6px;color:#ffdb83}.tower-tip small{display:block;font-size:11px;line-height:1.45;margin-top:3px;color:#f5eacb}@media(max-width:420px){.tower-tip{padding:9px;max-width:270px}.tower-tip-icon{font-size:21px}}
+
+/* Level 3: cinco torres no rodapé, roláveis no celular */
+.shop{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin}.shop .unit{flex:1 0 min(18%,110px)}
+
+.unit.limit-reached{filter:grayscale(.45);border-color:#a63c3c!important;cursor:not-allowed;position:relative}
+.unit.limit-reached .house-preview{opacity:.4}
+.unit .limit-x{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;color:#ff2020;font-size:clamp(37px,6vw,64px);font-weight:1000;line-height:1;text-shadow:-2px -2px 0 #370000,2px 2px 0 #370000,0 0 9px #ff4a4a;pointer-events:none}
+
+
+/* Alerta visual: pisca somente enquanto uma pena está caindo. */
+@keyframes featherMinimapAlert{0%,100%{border-color:#ffffff;box-shadow:0 0 5px #fff8,0 0 0 2px #ffffff66!important;filter:brightness(1)}50%{border-color:#77dfff;box-shadow:0 0 22px #a8edff,0 0 0 4px #b6f1ff!important;filter:brightness(1.55)}}
+.minimap.feather-alert{animation:featherMinimapAlert .65s ease-in-out infinite!important;}
+@media(prefers-reduced-motion:reduce){.minimap.feather-alert{animation:none!important;border:3px solid white!important;}}
+
+/* Tirinha de abertura: elementos CSS leves, sem imagens ou vídeo externos */
+
+/* Janela de pausa: sempre acima do jogo e dos controles. */
+.pause-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(3,12,20,.83);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pause-overlay[hidden]{display:none!important}
+.pause-panel{position:relative;z-index:1001;width:min(430px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:clamp(20px,4vw,32px);text-align:center;background:linear-gradient(155deg,#254b57,#102b3c);border:3px solid #b5eaff;border-radius:18px;box-shadow:0 15px 70px #000d,0 0 25px #8ddfff55;color:#fff}
+.pause-panel h2{font-size:clamp(22px,5vw,30px);margin:0 0 10px;text-shadow:0 2px 3px #000}
+.pause-panel p{font-size:clamp(13px,3vw,16px);margin:0 0 20px;color:#e6f5ff}
+.pause-actions{display:flex;flex-direction:column;gap:13px}
+.pause-actions button{display:block;width:100%;min-height:56px;border-radius:12px;border:3px solid #fff8;font-size:clamp(17px,4vw,21px);font-weight:1000;letter-spacing:.4px;cursor:pointer;box-shadow:0 5px 0 #06131d,0 5px 18px #0007;opacity:1;visibility:visible;touch-action:manipulation}
+#continueButton{background:linear-gradient(#fff2a1,#ffbc27);color:#342307;border-color:#fff3a0}
+#giveUpButton{background:linear-gradient(#ff7777,#c92329);color:#fff;border-color:#ffb6b6}
+.pause-actions button:active{transform:translateY(3px);box-shadow:0 2px 0 #06131d}
+@media(max-height:400px){.pause-panel{padding:12px}.pause-panel p{margin-bottom:10px}.pause-actions{gap:8px}.pause-actions button{min-height:42px}}
+
+/* Aviso da pena: minimapa ganha contorno amarelo e brilho forte. */
+.minimap.feather-alert{border:3px solid #ffe45e!important;box-shadow:0 0 0 3px #14272b,0 0 19px 5px #ffdf52,0 0 35px #4adfff!important;animation:featherMiniGlow .7s ease-in-out infinite alternate!important;}
+@keyframes featherMiniGlow{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+@media(prefers-reduced-motion:reduce){.minimap.feather-alert{animation:none!important}}
+
+/* EVENTO SURPRESA: goblin gigante bobo, duas vezes por partida. */
+.goblin-surpresa{position:fixed;inset:0;z-index:900;overflow:hidden;pointer-events:auto;background:rgba(8,22,9,.10);animation:susto-flash .36s ease-out both;touch-action:none;user-select:none}
+.goblin-surpresa[hidden]{display:none!important}
+.goblin-personagem{position:absolute;left:var(--goblin-lado,0%);bottom:-12%;width:min(82vw,610px);height:min(91dvh,690px);transform:translateY(110%);animation:goblin-susto .38s cubic-bezier(.12,1.5,.28,1) forwards;transform-origin:50% 85%;filter:drop-shadow(0 15px 28px #0009)}
+.goblin-surpresa.direita .goblin-personagem{left:auto;right:-4%}
+.goblin-surpresa.esquerda .goblin-personagem{left:-4%}
+.goblin-surpresa.saindo .goblin-personagem{animation:goblin-sai .65s ease-in forwards}
+@keyframes goblin-susto{0%{transform:translateY(120%) scale(.65) rotate(-9deg)}55%{transform:translateY(-6%) scale(1.18) rotate(5deg)}76%{transform:translateY(2%) scale(.97) rotate(-3deg)}100%{transform:translateY(0) scale(1) rotate(0)}}@keyframes susto-flash{0%{background:rgba(255,255,255,.72)}18%{background:rgba(250,255,210,.35)}100%{background:rgba(8,22,9,.10)}}@keyframes goblin-sai{from{transform:translateY(0)}to{transform:translateY(115%)}}
+.goblin-rosto{position:absolute;top:3%;left:10%;width:80%;height:73%;border-radius:47% 47% 43% 43%;border:clamp(4px,1vw,9px) solid #204b1b;background:radial-gradient(ellipse at 43% 32%,#b8f276 0%,#76c447 48%,#3e8c34 83%,#2b672a 100%);box-shadow:inset -23px -22px 30px #225a2777,inset 10px 9px 23px #efffa155;z-index:3}
+.goblin-orelha{position:absolute;top:29%;width:30%;height:22%;background:#6caf40;border:7px solid #285b25;border-radius:58% 42% 52% 48%;z-index:1}.goblin-orelha.esquerda{left:-15%;transform:rotate(-16deg)}.goblin-orelha.direita{right:-15%;transform:scaleX(-1) rotate(-16deg)}
+.goblin-olho{position:absolute;top:27%;width:30%;height:29%;background:#fffdf0;border:clamp(3px,.8vw,7px) solid #244c1b;border-radius:49% 49% 48% 48%;overflow:hidden;box-shadow:inset 2px 6px 8px #adb9a8}.olho-esq{left:16%;transform:rotate(-9deg)}.olho-dir{right:16%;transform:rotate(9deg)}
+.goblin-olho i{position:absolute;width:39%;height:46%;left:30%;top:33%;border-radius:50%;background:#30241b;border:3px solid #795c35;animation:olhar-bobo 1.45s steps(1,end) infinite}
+@keyframes olhar-bobo{0%,15%{left:8%}28%,45%{left:58%}58%,75%{left:30%}87%,100%{left:8%}}
+.goblin-sobrancelha{position:absolute;top:18%;width:26%;height:7%;border-top:clamp(6px,1.6vw,14px) solid #285b21;border-radius:50%;z-index:3}.sobrancelha-esq{left:17%;transform:rotate(-12deg)}.sobrancelha-dir{right:17%;transform:rotate(12deg)}
+.goblin-nariz{position:absolute;top:49%;left:39%;width:22%;height:18%;background:#60aa3c;border-radius:48%;border-bottom:5px solid #35762e;box-shadow:inset 6px 4px 8px #c1ed8166;z-index:4}
+.goblin-boca{position:absolute;top:73%;left:29%;width:42%;height:17%;background:#3c281f;border:6px solid #275421;border-radius:18% 18% 55% 55%;overflow:hidden;transform:rotate(3deg)}.goblin-boca b{position:absolute;top:-4px;width:22%;height:45%;background:#fff4c5;border-radius:0 0 50% 50%}.goblin-boca b:first-child{left:18%}.goblin-boca b:last-child{right:18%}
+.goblin-sardas{position:absolute;top:63%;font-size:clamp(14px,3vw,26px);color:#3b8b2c;letter-spacing:4px}.sardas-esq{left:10%}.sardas-dir{right:10%}
+.goblin-corpo{position:absolute;left:2%;bottom:-20%;width:96%;height:50%;border:8px solid #203f26;border-radius:45% 45% 0 0;background:linear-gradient(110deg,#5d402d 0%,#88603e 48%,#483524 100%);z-index:2}
+@media(max-width:600px){.goblin-personagem{width:100vw;height:min(75dvh,570px)}.goblin-surpresa.direita .goblin-personagem{right:-24%}.goblin-surpresa.esquerda .goblin-personagem{left:-24%}}
+
+/* Impacto visual rápido de susto; após a entrada, o goblin fica parado olhando para os lados. */
+.goblin-surpresa:not([hidden]):not(.saindo) .goblin-rosto{animation:susto-cabeca .43s ease-out both}
+@keyframes susto-cabeca{0%,30%{filter:brightness(1.2)}65%{filter:brightness(1)}100%{filter:none}}
+@media(prefers-reduced-motion:reduce){.goblin-surpresa,.goblin-personagem,.goblin-rosto{animation-duration:.01ms!important}}
+
+/* Level 9: rolagem horizontal de seis defesas, inclusive em celulares. */
+.shop{overflow-x:auto!important;overflow-y:hidden!important;justify-content:flex-start!important;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#a5cde0 #132e35;}
+.shop .unit{flex:0 0 clamp(112px,17vw,155px)!important;width:clamp(112px,17vw,155px)!important;scroll-snap-align:start;}
+@media(max-width:650px){.shop .unit{flex-basis:116px!important;width:116px!important}.shop{padding-bottom:max(5px,env(safe-area-inset-bottom))!important}}
+
+/* Animação de abertura da fase 9 */
+
+/* Zoom responsivo: mapa encostado ao rodapé da área de jogo, sem faixa vazia embaixo. */
+.arena{background-color:#244431;background-image:repeating-linear-gradient(135deg,#ffffff08 0px,#ffffff08 2px,transparent 2px,transparent 19px),radial-gradient(ellipse at center,#456c53,#172d28);background-attachment:local}
+.arena #board{margin-bottom:0!important;flex-shrink:0}
+
+/* Ocupa toda a janela do navegador, sem bordas laterais ou espaço inferior. */
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+.game,#app{width:100%!important;max-width:none!important;height:100vh;height:100dvh;min-height:0;margin:0!important}
+.arena,#stage{min-height:0;flex:1}
+.arena{padding:0!important}
+.arena #board{margin-top:0!important}
+#fullscreenButton{position:fixed;z-index:1100;right:8px;top:6px;padding:7px 10px;border:1px solid #e3ca83;border-radius:5px;background:#173b2df0;color:#fff3bd;font:700 11px system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+#fullscreenButton:focus-visible{outline:3px solid #fff}
+@media(max-width:650px){#fullscreenButton{font-size:10px;padding:5px 7px;top:4px;right:4px}.hud .stats{padding-right:86px}#app header .stats{padding-right:86px}}
+
+/* Tela cheia obrigatória a partir do menu */
+#fullscreenGate{position:fixed;inset:0;z-index:99999;background:rgba(5,16,22,.96);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:system-ui,sans-serif;text-align:center;color:white}
+#fullscreenGate[hidden]{display:none!important}
+#fullscreenGate .gatePanel{width:min(440px,100%);padding:30px 22px;background:#17372d;border:2px solid #c7a95c;border-radius:18px;box-shadow:0 20px 70px #0009}
+#fullscreenGate h2{font-size:clamp(21px,5vw,29px);margin:0 0 12px}
+#fullscreenGate p{line-height:1.5;font-size:15px;margin:0 0 22px}
+#gateEnter{padding:15px 22px;border:0;border-radius:10px;background:#eac76a;color:#17281c;font-size:16px;font-weight:800;cursor:pointer;width:100%}
+#gateError{font-size:13px;color:#ffccbb;margin-top:14px;min-height:18px}
+
+/* Tela cheia controlada exclusivamente pelo menu principal */
+#fullscreenButton,#fullscreenGate{display:none!important}
+
+.goblin-surpresa{position:fixed;inset:0;z-index:900;overflow:hidden;pointer-events:auto;background:rgba(8,22,9,.10);animation:susto-flash .36s ease-out both;touch-action:none;user-select:none}
+.goblin-surpresa[hidden]{display:none!important}
+.goblin-personagem{position:absolute;left:var(--goblin-lado,0%);bottom:-12%;width:min(82vw,610px);height:min(91dvh,690px);transform:translateY(110%);animation:goblin-susto .38s cubic-bezier(.12,1.5,.28,1) forwards;transform-origin:50% 85%;filter:drop-shadow(0 15px 28px #0009)}
+.goblin-surpresa.direita .goblin-personagem{left:auto;right:-4%}
+.goblin-surpresa.esquerda .goblin-personagem{left:-4%}
+.goblin-surpresa.saindo .goblin-personagem{animation:goblin-sai .65s ease-in forwards}
+@keyframes goblin-susto{0%{transform:translateY(120%) scale(.65) rotate(-9deg)}55%{transform:translateY(-6%) scale(1.18) rotate(5deg)}76%{transform:translateY(2%) scale(.97) rotate(-3deg)}100%{transform:translateY(0) scale(1) rotate(0)}}@keyframes susto-flash{0%{background:rgba(255,255,255,.72)}18%{background:rgba(250,255,210,.35)}100%{background:rgba(8,22,9,.10)}}@keyframes goblin-sai{from{transform:translateY(0)}to{transform:translateY(115%)}}
+.goblin-rosto{position:absolute;top:3%;left:10%;width:80%;height:73%;border-radius:47% 47% 43% 43%;border:clamp(4px,1vw,9px) solid #204b1b;background:radial-gradient(ellipse at 43% 32%,#b8f276 0%,#76c447 48%,#3e8c34 83%,#2b672a 100%);box-shadow:inset -23px -22px 30px #225a2777,inset 10px 9px 23px #efffa155;z-index:3}
+.goblin-orelha{position:absolute;top:29%;width:30%;height:22%;background:#6caf40;border:7px solid #285b25;border-radius:58% 42% 52% 48%;z-index:1}.goblin-orelha.esquerda{left:-15%;transform:rotate(-16deg)}.goblin-orelha.direita{right:-15%;transform:scaleX(-1) rotate(-16deg)}
+.goblin-olho{position:absolute;top:27%;width:30%;height:29%;background:#fffdf0;border:clamp(3px,.8vw,7px) solid #244c1b;border-radius:49% 49% 48% 48%;overflow:hidden;box-shadow:inset 2px 6px 8px #adb9a8}.olho-esq{left:16%;transform:rotate(-9deg)}.olho-dir{right:16%;transform:rotate(9deg)}
+.goblin-olho i{position:absolute;width:39%;height:46%;left:30%;top:33%;border-radius:50%;background:#30241b;border:3px solid #795c35;animation:olhar-bobo 1.45s steps(1,end) infinite}
+@keyframes olhar-bobo{0%,15%{left:8%}28%,45%{left:58%}58%,75%{left:30%}87%,100%{left:8%}}
+.goblin-sobrancelha{position:absolute;top:18%;width:26%;height:7%;border-top:clamp(6px,1.6vw,14px) solid #285b21;border-radius:50%;z-index:3}.sobrancelha-esq{left:17%;transform:rotate(-12deg)}.sobrancelha-dir{right:17%;transform:rotate(12deg)}
+.goblin-nariz{position:absolute;top:49%;left:39%;width:22%;height:18%;background:#60aa3c;border-radius:48%;border-bottom:5px solid #35762e;box-shadow:inset 6px 4px 8px #c1ed8166;z-index:4}
+.goblin-boca{position:absolute;top:73%;left:29%;width:42%;height:17%;background:#3c281f;border:6px solid #275421;border-radius:18% 18% 55% 55%;overflow:hidden;transform:rotate(3deg)}.goblin-boca b{position:absolute;top:-4px;width:22%;height:45%;background:#fff4c5;border-radius:0 0 50% 50%}.goblin-boca b:first-child{left:18%}.goblin-boca b:last-child{right:18%}
+.goblin-sardas{position:absolute;top:63%;font-size:clamp(14px,3vw,26px);color:#3b8b2c;letter-spacing:4px}.sardas-esq{left:10%}.sardas-dir{right:10%}
+.goblin-corpo{position:absolute;left:2%;bottom:-20%;width:96%;height:50%;border:8px solid #203f26;border-radius:45% 45% 0 0;background:linear-gradient(110deg,#5d402d 0%,#88603e 48%,#483524 100%);z-index:2}
+@media(max-width:600px){.goblin-personagem{width:100vw;height:min(75dvh,570px)}.goblin-surpresa.direita .goblin-personagem{right:-24%}.goblin-surpresa.esquerda .goblin-personagem{left:-24%}}
+
+/* Impacto visual rápido de susto; após a entrada, o goblin fica parado olhando para os lados. */
+.goblin-surpresa:not([hidden]):not(.saindo) .goblin-rosto{animation:susto-cabeca .43s ease-out both}
+@keyframes susto-cabeca{0%,30%{filter:brightness(1.2)}65%{filter:brightness(1)}100%{filter:none}}
+@media(prefers-reduced-motion:reduce){.goblin-surpresa,.goblin-personagem,.goblin-rosto{animation-duration:.01ms!important}}
+
+
+/* Variante cinza: goblin das montanhas do Level 13 */
+.goblin-surpresa .goblin-rosto{border-color:#424951;background:radial-gradient(ellipse at 43% 32%,#e1e4e6 0%,#a3aab0 48%,#737d87 83%,#4d5964 100%);box-shadow:inset -23px -22px 30px #343b4777,inset 10px 9px 23px #ffffff55}
+.goblin-surpresa .goblin-orelha{background:#9ca4ab;border-color:#424951}
+.goblin-surpresa .goblin-sobrancelha{border-top-color:#3f4953}
+.goblin-surpresa .goblin-olho{border-color:#48515a}
+.goblin-surpresa .goblin-nariz{background:#929aa3;border-bottom-color:#58636e}
+.goblin-surpresa .goblin-boca{border-color:#49525c}
+.goblin-surpresa .goblin-sardas{color:#616d79}
+.goblin-surpresa .goblin-corpo{border-color:#434a50;background:linear-gradient(110deg,#52535c 0%,#7d7880 48%,#45434b 100%)}
+
+/* Level 13: todas as seis torres visíveis sem rolagem na barra inferior. */
+.shop{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:clamp(2px,.6vw,8px)!important;overflow:hidden!important;justify-content:stretch!important;align-items:stretch!important;scroll-snap-type:none!important;padding-left:clamp(3px,1vw,10px)!important;padding-right:clamp(3px,1vw,10px)!important}
+.shop .unit{min-width:0!important;max-width:none!important;width:100%!important;flex:none!important;scroll-snap-align:none!important;padding:3px 1px!important;gap:1px!important}
+.shop .unit .emoji{font-size:clamp(16px,3.4vw,30px)!important;min-height:0!important;line-height:1.05!important}
+.shop .unit .house-preview{max-width:100%!important;max-height:46px!important;object-fit:contain!important}
+.shop .unit .name{font-size:clamp(7px,1.45vw,12px)!important;line-height:1.05!important;text-align:center;overflow-wrap:anywhere}
+.shop .unit .price{font-size:clamp(8px,1.4vw,11px)!important;padding:2px!important}
+@media(max-width:650px){.shop{height:clamp(65px,11dvh,86px)!important;gap:2px!important}.shop .unit{border-width:1px!important;border-radius:5px!important}.shop .unit .emoji{font-size:clamp(15px,5vw,23px)!important}.shop .unit .house-preview{max-height:36px!important}.shop .unit .name{font-size:8px!important}.shop .unit .price{font-size:8px!important;top:1px!important;left:1px!important}}
+
+/* Level 14: tempestade de cinzas descendo do topo, 14 segundos, sem bloquear toques. */
+.ash-overlay{position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden;isolation:isolate;}
+.ash-overlay[hidden]{display:none!important}
+/* A cortina de cinzas começa fina no alto e desce gradualmente em 3,5 segundos. */
+.ash-overlay::before{content:"";position:absolute;inset:0;z-index:0;
+ background:radial-gradient(ellipse at 35% 25%,rgba(125,124,120,.32),rgba(50,49,46,.56) 75%),rgba(62,61,59,.19);
+ backdrop-filter:grayscale(.58) contrast(.84);-webkit-backdrop-filter:grayscale(.58) contrast(.84);
+ clip-path:inset(0 0 100% 0);}
+.ash-overlay.ash-active::before{animation:ash-curtain 3.5s ease-in forwards;}
+@keyframes ash-curtain{0%{clip-path:inset(0 0 99% 0);opacity:.3}100%{clip-path:inset(0 0 0 0);opacity:1}}
+.ash-flake{position:absolute;z-index:1;left:var(--x);top:-4vh;width:var(--size);height:var(--size);border-radius:50%;
+ background:rgba(225,221,214,var(--alpha));box-shadow:0 0 6px 1px rgba(190,184,176,.24);
+ opacity:0;animation:ash-fall var(--duration) linear var(--delay) infinite;animation-play-state:paused;will-change:transform;}
+.ash-overlay.ash-active .ash-flake{animation-play-state:running;}
+@keyframes ash-fall{0%{transform:translate3d(0,-6vh,0) scale(.35);opacity:0}12%{opacity:.8}85%{opacity:.8}100%{transform:translate3d(var(--dx),116vh,0) scale(1);opacity:0}}
+.ash-paused .ash-flake,.ash-paused .ash-overlay::before{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.ash-overlay.ash-active::before{animation-duration:3.5s}.ash-flake{box-shadow:none}}
+
